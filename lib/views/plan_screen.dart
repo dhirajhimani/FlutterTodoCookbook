@@ -1,8 +1,11 @@
 import 'package:cookbook_ch_06_copy/models/data_layer.dart';
-import 'package:cookbook_ch_06_copy/plan_provider.dart';
 import 'package:flutter/material.dart';
 
 class PlanScreen extends StatefulWidget {
+  final Plan plan;
+
+  const PlanScreen({Key? key, required this.plan}) : super(key: key);
+
   @override
   State createState() => _PlanScreenState();
 }
@@ -21,16 +24,15 @@ class _PlanScreenState extends State<PlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final plan = PlanProvider.of(context);
     return Scaffold(
       appBar: AppBar(title: Text('Master Plan')),
       body: Column(
         children: [
-          Expanded(child: _buildList(plan)),
-          SafeArea(child: Text(plan.completenessMessage)),
+          Expanded(child: _buildList(widget.plan)),
+          SafeArea(child: Text(widget.plan.completenessMessage)),
         ],
       ),
-      floatingActionButton: _buildAddTaskButton(plan),
+      floatingActionButton: _buildAddTaskButton(widget.plan),
     );
   }
 
