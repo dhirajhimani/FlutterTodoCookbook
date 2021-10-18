@@ -1,4 +1,3 @@
-import 'package:cookbook_ch_06_copy/models/data_layer.dart';
 import 'package:cookbook_ch_06_copy/plan_provider.dart';
 import 'package:cookbook_ch_06_copy/views/plan_screen.dart';
 import 'package:flutter/material.dart';
@@ -47,15 +46,16 @@ class _PlanCreatorScreenState extends State {
     if (text.isEmpty) {
       return;
     }
-    final plan = Plan()..name = text;
-    PlanProvider.of(context).add(plan);
+
+    PlanProvider.of(context).addNewPlan(text);
+
     textController.clear();
     FocusScope.of(context).requestFocus(FocusNode());
     setState(() {});
   }
 
   Widget _buildMasterPlans() {
-    final plans = PlanProvider.of(context);
+    final plans = PlanProvider.of(context).plans;
     if (plans.isEmpty) {
       return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -69,13 +69,23 @@ class _PlanCreatorScreenState extends State {
         itemCount: plans.length,
         itemBuilder: (context, index) {
           final plan = plans[index];
-          return ListTile(
-              title: Text(plan.name),
-              subtitle: Text(plan.completenessMessage),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => PlanScreen(plan: plan)));
-              });
+          return Dismissible(
+            key: ValueKey(plan),
+            background: Container(color: Colors.red),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_) {
+              final controller = PlanProvider.of(context);
+              controller.deletePlan(plan);
+              setState(() {});
+            },
+            child: ListTile(
+                title: Text(plan.name),
+                subtitle: Text(plan.completenessMessage),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => PlanScreen(plan: plan)));
+                }),
+          );
         });
   }
 }

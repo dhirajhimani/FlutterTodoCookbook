@@ -1,4 +1,5 @@
 import 'package:cookbook_ch_06_copy/models/data_layer.dart';
+import 'package:cookbook_ch_06_copy/plan_provider.dart';
 import 'package:flutter/material.dart';
 
 class PlanScreen extends StatefulWidget {
@@ -46,9 +47,9 @@ class _PlanScreenState extends State<PlanScreen> {
     return FloatingActionButton(
       child: Icon(Icons.add),
       onPressed: () {
-        setState(() {
-          plan.tasks.add(Task());
-        });
+        final controller = PlanProvider.of(context);
+        controller.createNewTask(plan);
+        setState(() {});
       },
     );
   }
@@ -57,28 +58,38 @@ class _PlanScreenState extends State<PlanScreen> {
     return ListView.builder(
       controller: scrollController,
       itemCount: plan.tasks.length,
-      itemBuilder: (context, index) => _buildTaskTile(plan.tasks[index]),
+      itemBuilder: (context, index) => _buildTaskTile(plan, plan.tasks[index]),
     );
   }
 
-  Widget _buildTaskTile(Task task) {
-    return ListTile(
-      leading: Checkbox(
-          value: task.complete,
-          onChanged: (selected) {
-            setState(() {
-              task.complete = selected ?? false;
-            });
-          }),
-      title: TextFormField(
-        initialValue: task.description,
-        onFieldSubmitted: (text) {
-          setState(
-            () {
-              task.description = text;
-            },
-          );
-        },
+  Widget _buildTaskTile(Plan plan, Task task) {
+    return Dismissible(
+      key: ValueKey(task),
+      background: Container(color: Colors.red),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) {
+        final controller = PlanProvider.of(context);
+        controller.deleteTask(plan, task);
+        setState(() {});
+      },
+      child: ListTile(
+        leading: Checkbox(
+            value: task.complete,
+            onChanged: (selected) {
+              setState(() {
+                task.complete = selected ?? false;
+              });
+            }),
+        title: TextFormField(
+          initialValue: task.description,
+          onFieldSubmitted: (text) {
+            setState(
+              () {
+                task.description = text;
+              },
+            );
+          },
+        ),
       ),
     );
   }

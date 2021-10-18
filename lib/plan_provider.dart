@@ -1,8 +1,8 @@
-import 'package:cookbook_ch_06_copy/models/plan.dart';
+import 'package:cookbook_ch_06_copy/controllers/plan_controller.dart';
 import 'package:flutter/material.dart';
 
 class PlanProvider extends InheritedWidget {
-  final _plans = <Plan>[];
+  final _controller = PlanController();
 
   PlanProvider({Key? key, required Widget child})
       : super(key: key, child: child);
@@ -10,17 +10,9 @@ class PlanProvider extends InheritedWidget {
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) => false;
 
-  static List<Plan> of(BuildContext context) {
-    final provider =
+  static PlanController of(BuildContext context) {
+    PlanProvider provider =
         context.dependOnInheritedWidgetOfExactType<PlanProvider>()!;
-    if (provider._plans.isEmpty) {
-      //debugDumpApp();
-      print('first time');
-      final plan = Plan()..name = 'Plan 1';
-      provider._plans.add(plan);
-      final plan2 = Plan()..name = 'Plan 2';
-      provider._plans.add(plan2);
-    }
-    return provider._plans;
+    return provider._controller;
   }
 }
