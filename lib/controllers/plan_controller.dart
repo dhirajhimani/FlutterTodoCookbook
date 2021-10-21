@@ -1,10 +1,11 @@
 import 'package:cookbook_ch_06_copy/models/data_layer.dart';
+import 'package:cookbook_ch_06_copy/services/plan_services.dart';
 
 class PlanController {
-  final _plans = <Plan>[];
+  final services = PlanServices();
 
 // This public getter cannot be modified by any other object
-  List<Plan> get plans => List.unmodifiable(_plans);
+  List<Plan> get plans => List.unmodifiable(services.getAllPlans());
 
   String _checkForDuplicates(Iterable<String> items, String text) {
     final duplicatedCount = items.where((item) => item.contains(text)).length;
@@ -18,13 +19,16 @@ class PlanController {
     if (name.isEmpty) {
       return;
     }
-    name = _checkForDuplicates(_plans.map((plan) => plan.name), name);
-    final plan = Plan()..name = name;
-    _plans.add(plan);
+    name = _checkForDuplicates(plans.map((plan) => plan.name), name);
+    services.createPlan(name);
   }
 
   void deletePlan(Plan plan) {
-    _plans.remove(plan);
+    services.delete(plan);
+  }
+
+  void savePlan(Plan plan) {
+    services.savePlan(plan);
   }
 
   void createNewTask(Plan plan, [String? description]) {
@@ -33,11 +37,10 @@ class PlanController {
     }
     description = _checkForDuplicates(
         plan.tasks.map((task) => task.description), description);
-    final task = Task()..description = description;
-    plan.tasks.add(task);
+    services.addTask(plan, description);
   }
 
   void deleteTask(Plan plan, Task task) {
-    plan.tasks.remove(task);
+    services.deleteTask(plan, task);
   }
 }
